@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HDMI Matrix Switcher</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>HDMI Matrix Switcher</h1>
+
+    <nav>
+        <button onclick="showTab('control')"> Control</button>
+        <button onclick="showTab('settings')"> Settings</button>
+        <button onclick="toggleDarkMode()"> Dark Mode</button>
+    </nav>
+
+        <h2>Voice Control</h2>
+        <button id="voiceButton">🎙️ Start Listening</button>
+        <p id="voiceStatus">Say a command...</p>
+
+    <div id="control" class="tab">
+        <h2>Matrix Switching</h2>
+        <div class="matrix">
+            <!-- Output 1 -->
+            <button onclick="switchHDMI(1,1)">Output 1 → Input 1</button>
+            <button onclick="switchHDMI(1,2)">Output 1 → Input 2</button>
+            <button onclick="switchHDMI(1,3)">Output 1 → Input 3</button>
+            <button onclick="switchHDMI(1,4)">Output 1 → Input 4</button>
+
+            <!-- Output 2 -->
+            <button onclick="switchHDMI(2,1)">Output 2 → Input 1</button>
+            <button onclick="switchHDMI(2,2)">Output 2 → Input 2</button>
+            <button onclick="switchHDMI(2,3)">Output 2 → Input 3</button>
+            <button onclick="switchHDMI(2,4)">Output 2 → Input 4</button>
+
+            <!-- Output 3 -->
+            <button onclick="switchHDMI(3,1)">Output 3 → Input 1</button>
+            <button onclick="switchHDMI(3,2)">Output 3 → Input 2</button>
+            <button onclick="switchHDMI(3,3)">Output 3 → Input 3</button>
+            <button onclick="switchHDMI(3,4)">Output 3 → Input 4</button>
+
+            <!-- Output 4 -->
+            <button onclick="switchHDMI(4,1)">Output 4 → Input 1</button>
+            <button onclick="switchHDMI(4,2)">Output 4 → Input 2</button>
+            <button onclick="switchHDMI(4,3)">Output 4 → Input 3</button>
+            <button onclick="switchHDMI(4,4)">Output 4 → Input 4</button>
+        </div>
+
+        <h2>Volume Control</h2>
+        <div class="volume-controls">
+            <label>Output 1:
+                <input type="range" min="0" max="100" value="50" id="vol1" oninput="adjustVolume(1, this.value)">
+                <span id="vol1-display">50%</span>
+                <button onclick="toggleMute(1)">🔇</button>
+            </label>
+
+            <label>Output 2:
+                <input type="range" min="0" max="100" value="50" id="vol2" oninput="adjustVolume(2, this.value)">
+                <span id="vol2-display">50%</span>
+                <button onclick="toggleMute(2)">🔇</button>
+            </label>
+
+            <label>Output 3:
+                <input type="range" min="0" max="100" value="50" id="vol3" oninput="adjustVolume(3, this.value)">
+                <span id="vol3-display">50%</span>
+                <button onclick="toggleMute(3)">🔇</button>
+            </label>
+
+            <label>Output 4:
+                <input type="range" min="0" max="100" value="50" id="vol4" oninput="adjustVolume(4, this.value)">
+                <span id="vol4-display">50%</span>
+                <button onclick="toggleMute(4)">🔇</button>
+            </label>
+        </div>
+
+        <p id="status">Fetching HDMI switcher status...</p>
+        <button onclick="fetchStatus()">🔄 Refresh Status</button>
+    </div>
+
+    <div id="settings" class="tab" style="display:none;">
+        <h2> Settings</h2>
+        <button onclick="sendCommand('PWON.')">Power On</button>
+        <button onclick="sendCommand('PWOFF.')">Power Off</button>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll(".tab").forEach(el => el.style.display = "none");
+            document.getElementById(tab).style.display = "block";
+        }
+
+
+            // Speech Recognition API (Chrome & Edge)
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = false;
+            recognition.lang = "en-US";
+
+            // Handle voice command processing
+            recognition.onresult = async (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById("voiceStatus").textContent = `Heard: "${transcript}"`;
+
+            if (transcript.includes("switch output")) {
+                const match = transcript.match(/switch output (\d+) to input (\d+)/);
+                if (match) {
+                const output = match[1];
+                const input = match[2];
+                await switchHDMI(output, input);
+                document.getElementById("voiceStatus").textContent = `Switched Output ${output} to Input ${input}`;
+            }
+        } 
+    
+        else if (transcript.includes("set volume")) {
+            const match = transcript.match(/set volume (\d+) to (\d+)%/);
+            if (match) {
+                const output = match[1];
+                const volume = match[2];
+                await adjustVolume(output, volume);
+                document.getElementById("voiceStatus").textContent = `Set Volume ${output} to ${volume}%`;
+            }
+        } 
+    
+        else if (transcript.includes("mute output")) {
+            const match = transcript.match(/mute output (\d+)/);
+            if (match) {
+                const output = match[1];
+                await toggleMute(output);
+                document.getElementById("voiceStatus").textContent = `Muted Output ${output}`;
+            }
+        } 
+    
+        else if (transcript.includes("unmute output")) {
+            const match = transcript.match(/unmute output (\d+)/);
+            if (match) {
+                const output = match[1];
+                await toggleMute(output);
+                document.getElementById("voiceStatus").textContent = `Unmuted Output ${output}`;
+            }
+        } 
+    
+        else {
+            XMLDocument.getElementById("voiceStatus").textContent = "Command not recognized.";
+        }
+    };
+
+    // Start listening when button is clicked
+    document.getElementById("voiceButton").addEventListener("click", () => {
+        recognition.start();
+        document.getElementById("voiceStatus").textContent = "Listening...";
+    });
+        async function switchHDMI(output, input) {
+            try {
+                const response = await fetch("/api/switch-hdmi", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ input, output }),
+                });
+
+                const result = await response.json();
+                 if (result.success) {
+                     document.getElementById("status").textContent = `Switched Output ${output} to Input ${input}`;
+                } else {
+                     document.getElementById("status").textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById("status").textContent = `Fetch Error: ${error.message}`;
+            }
+        }
+
+        async function adjustVolume(output, volume) {
+            document.getElementById(`vol${output}-display`).textContent = `${volume}%`;
+            try {
+                await fetch("/api/set-volume", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ output, volume }),
+            });
+            } catch (error) {
+                console.error("Volume Error:", error);
+            }
+        }
+
+        async function toggleMute(output) {
+            const button = document.querySelector(`label:nth-child(${output}) button`);
+            const state = button.textContent === "🔇" ? "unmute" : "mute";
+            button.textContent = state === "mute" ? "🔊" : "🔇";
+            try {
+                await fetch("/api/mute", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ output, state }),
+                });
+            } catch (error) {
+                console.error("Mute Error:", error);
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/api/status");
+                const data = await res.json();
+
+            if (data.success) {
+                document.getElementById("status").textContent = data.data;
+
+            // Highlight active input/output
+            updateUIFromStatus(data.data);
+        } else {
+            document.getElementById("status").textContent = "Error fetching status.";
+        }
+    } catch (error) {
+        document.getElementById("status").textContent = `Status Error: ${error.message}`;
+    }           
+}
+
+    // ✅ Auto-refresh status every 5 seconds
+    setInterval(fetchStatus, 5000);
+    function updateUIFromStatus(statusData) {
+            document.querySelectorAll(".matrix button").forEach(btn => btn.classList.remove("active"));
+
+    // Example status response: "Output 1 → Input 3, Output 2 → Input 1"
+    const matches = statusData.match(/Output (\d+) → Input (\d+)/g);
+    if (matches) {
+        matches.forEach(match => {
+            const [, output, input] = match.match(/Output (\d+) → Input (\d+)/);
+            const button = document.querySelector(`button[onclick="switchHDMI(${output},${input})"]`);
+            if (button) button.classList.add("active");
+        });
+    }
+}
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+
+</body>
+</html>

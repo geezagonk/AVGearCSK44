@@ -76,10 +76,10 @@ app.post("/api/mute", async (req, res) => {
     }
 });
 
-// API: Get Current Status
+// API: Get Current HDMI Matrix Status
 app.get("/api/status", async (req, res) => {
     try {
-        const response = await sendTcpCommand("Status.");
+        const response = await sendTcpCommand("Status."); // Command to get status
         res.json({ success: true, data: response });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

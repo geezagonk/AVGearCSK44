@@ -1,0 +1,167 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif, sans-serif;
+    background-blend-mode: darken;
+    background-color: #2e282c;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    background-image: url('./B62ACAB8-F08F-42B3-B2B9-B64660C90DC7_4_5005_c.jpeg');
+    background-position: center 3in;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+/* Navigation Bar */
+nav {
+    margin-bottom: 20px;
+}
+nav button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+nav button:hover {
+    background: #b929a6;
+}
+
+/* Matrix Switching Buttons */
+.matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.matrix button {
+    background: #3498db;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+    color: white;
+    width: 100%;
+}
+
+.matrix button:hover {
+    background: #b929a8;
+}
+
+.matrix button.active {
+    background: #2ecc71;
+}
+
+/* Volume Control */
+.volume-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: auto;
+}
+
+.volume-controls label {
+    font-size: 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+input[type="range"] {
+    width: 150px;
+    cursor: pointer;
+}
+
+button {
+    background: #3498db;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+/* Tabs */
+.tab {
+    display: none;
+    margin-top: 20px;
+}
+
+#control {
+    display: block; /* Default tab */
+}
+
+/* Dark Mode */
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+.dark-mode nav button {
+    background: #555;
+}
+
+.dark-mode .matrix button {
+    background: #444;
+}
+
+.dark-mode .matrix button:hover {
+    background: #666;
+}
+
+.dark-mode input[type="range"] {
+    filter: invert(1);
+}
+
+/* Make buttons larger for touchscreens */
+button {
+    padding: 15px 20px;
+    font-size: 18px;
+    border-radius: 8px;
+}
+
+/* Increase slider size for better touch control */
+input[type="range"] {
+    width: 200px;
+    height: 10px;
+}
+#voiceButton {
+    background: #3498db;
+    color: white;
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+}
+
+#voiceButton:hover {
+    background: #b929a8;
+}
+
+#voiceStatus {
+    font-size: 16px;
+    margin-top: 10px;
+}
