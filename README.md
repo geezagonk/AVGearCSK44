@@ -12,7 +12,4 @@ start the server with
 
 $node server.js
 
-or; for the perenially lazy, like me, use docker
 
-docker build -t hdmi-switcher .
-docker run -d -p 3000:3000 --name hdmi-switcher hdmi-switcher
